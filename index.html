@@ -3,99 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Credit to INR Calculator</title>
+    <title>Credit to INR Calculator</title>
     <style>
         :root {
             --primary: #4361ee;
             --primary-light: #4895ef;
-            --secondary: #3f37c9;
+            --secondary: #3a0ca3;
             --accent: #4cc9f0;
-            --light: rgba(255, 255, 255, 0.9);
+            --light: #f8f9fa;
             --dark: #212529;
             --success: #4cc9f0;
             --warning: #f72585;
             --border-radius: 12px;
-            --box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.2);
-            --glass-blur: blur(10px);
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        /* Dark mode variables */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --light: #121212;
+                --dark: #f8f9fa;
+                --primary: #5a7dff;
+                --secondary: #7b4dff;
+                --accent: #00e5ff;
+            }
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e2e8f0 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 16px;
             color: var(--dark);
+            line-height: 1.6;
+            transition: var(--transition);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
+            }
         }
 
         .container {
             width: 100%;
-            max-width: 650px;
-            background: var(--glass-bg);
+            max-width: 500px;
+            background: var(--light);
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
             overflow: hidden;
             transition: var(--transition);
-            backdrop-filter: var(--glass-blur);
-            border: var(--glass-border);
         }
 
         .header {
             background: linear-gradient(to right, var(--primary), var(--secondary));
             color: white;
-            padding: 25px;
+            padding: 20px;
             text-align: center;
             position: relative;
-            overflow: hidden;
-        }
-
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
-            transform: rotate(30deg);
         }
 
         .header h1 {
-            font-size: 1.8rem;
-            margin-bottom: 5px;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
             font-weight: 700;
-            position: relative;
         }
 
         .header p {
             opacity: 0.9;
             font-size: 0.9rem;
-            position: relative;
         }
 
         .content {
-            padding: 30px;
+            padding: 20px;
         }
 
         .input-group {
-            margin-bottom: 25px;
-            position: relative;
+            margin-bottom: 20px;
         }
 
         label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-weight: 600;
             color: var(--dark);
             font-size: 0.95rem;
@@ -103,88 +102,31 @@
 
         input {
             width: 100%;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.8);
-            border: 2px solid rgba(0, 0, 0, 0.05);
+            padding: 14px;
+            background: var(--light);
+            border: 2px solid rgba(0, 0, 0, 0.1);
             border-radius: var(--border-radius);
             font-size: 1rem;
             transition: var(--transition);
             color: var(--dark);
         }
 
+        @media (prefers-color-scheme: dark) {
+            input {
+                background: #1e1e1e;
+                border-color: rgba(255, 255, 255, 0.1);
+            }
+        }
+
         input:focus {
             border-color: var(--accent);
             outline: none;
             box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
-            background: white;
-        }
-
-        .rate-control {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 26px;
-            margin: 0 10px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(24px);
-        }
-
-        .rate-mode-label {
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--dark);
-        }
-
-        .manual-rate-group {
-            display: none;
-            margin-top: 15px;
         }
 
         button {
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             background: linear-gradient(to right, var(--primary), var(--secondary));
             color: white;
             border: none;
@@ -193,8 +135,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
-            margin-bottom: 20px;
-            letter-spacing: 0.5px;
+            margin-bottom: 16px;
         }
 
         button:hover {
@@ -206,19 +147,44 @@
             transform: translateY(0);
         }
 
+        .secondary-btn {
+            background: var(--light);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            margin-top: 8px;
+        }
+
+        .secondary-btn:hover {
+            background: rgba(67, 97, 238, 0.1);
+        }
+
         .results {
-            background: rgba(248, 249, 250, 0.7);
+            background: rgba(0, 0, 0, 0.05);
             border-radius: var(--border-radius);
-            padding: 25px;
+            padding: 20px;
             margin-top: 20px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .results {
+                background: rgba(255, 255, 255, 0.05);
+                border-color: rgba(255, 255, 255, 0.1);
+            }
         }
 
         .result-item {
             display: flex;
             justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .result-item {
+                border-bottom-color: rgba(255, 255, 255, 0.1);
+            }
         }
 
         .result-item:last-child {
@@ -236,8 +202,8 @@
         }
 
         .final-result {
-            margin-top: 15px;
-            padding-top: 15px;
+            margin-top: 12px;
+            padding-top: 12px;
             border-top: 2px dashed var(--accent);
         }
 
@@ -250,61 +216,73 @@
             color: var(--secondary);
         }
 
-        .loading {
-            text-align: center;
-            padding: 10px;
-            color: var(--accent);
-            font-style: italic;
-        }
-
         .error {
             color: var(--warning);
             text-align: center;
-            padding: 10px;
+            padding: 12px;
             font-weight: 600;
             background: rgba(247, 37, 133, 0.1);
             border-radius: var(--border-radius);
-            margin-bottom: 15px;
+            margin-bottom: 16px;
+            display: none;
         }
 
-        .exchange-rate {
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .btn-group button {
+            margin-bottom: 0;
+            flex: 1;
+        }
+
+        .credit {
             text-align: center;
-            font-size: 0.9rem;
-            color: #6c757d;
-            margin-bottom: 20px;
-            padding: 10px;
-            background: rgba(76, 201, 240, 0.1);
-            border-radius: var(--border-radius);
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: rgba(0, 0, 0, 0.6);
+            transition: var(--transition);
         }
 
-        .exchange-rate span {
+        @media (prefers-color-scheme: dark) {
+            .credit {
+                color: rgba(255, 255, 255, 0.6);
+            }
+        }
+
+        .credit a {
+            color: var(--primary);
+            text-decoration: none;
             font-weight: 600;
-            color: var(--success);
         }
 
-        @media (max-width: 600px) {
-            .header h1 {
-                font-size: 1.5rem;
+        .credit a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 16px;
             }
             
             .content {
-                padding: 20px;
+                padding: 16px;
             }
             
-            .rate-control {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .toggle-switch {
-                margin: 10px 0;
+            input, button {
+                padding: 12px;
             }
         }
 
-        /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        .results {
+            animation: fadeIn 0.3s ease-out;
         }
 
         @keyframes pulse {
@@ -313,51 +291,47 @@
             100% { transform: scale(1); }
         }
 
-        .results {
-            animation: fadeIn 0.5s ease-out;
-        }
-
         button:hover {
-            animation: pulse 1.5s infinite;
+            animation: pulse 1s infinite;
         }
 
-        .tooltip {
-            position: relative;
-            display: inline-block;
-            margin-left: 5px;
-            cursor: pointer;
-        }
-
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 200px;
-            background-color: #555;
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 8px;
+        .theme-toggle {
             position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 0.8rem;
-            font-weight: normal;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
         }
 
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .theme-toggle svg {
+            width: 16px;
+            height: 16px;
+            fill: white;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Advanced Credit Calculator</h1>
-            <p>Convert credits to INR with real-time or custom exchange rates</p>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1-8.313-12.454z"/>
+                </svg>
+            </button>
+            <h1>Credit to INR Calculator</h1>
+            <p>Convert your credits to INR with current exchange rate</p>
         </div>
         
         <div class="content">
@@ -366,25 +340,12 @@
                 <input type="number" id="credit" placeholder="e.g. 1000" min="0" step="1">
             </div>
             
-            <div class="rate-control">
-                <span class="rate-mode-label">Auto Fetch Exchange Rate</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="autoRateToggle" checked>
-                    <span class="slider"></span>
-                </label>
-                <span class="rate-mode-label">Manual Rate</span>
+            <div class="input-group">
+                <label for="exchangeRate">Current USD to INR Rate:</label>
+                <input type="number" id="exchangeRate" placeholder="e.g. 83.50" min="0" step="0.01" value="83.50">
             </div>
             
-            <div class="manual-rate-group" id="manualRateGroup">
-                <label for="manualRate">Enter USD to INR Rate:</label>
-                <input type="number" id="manualRate" placeholder="e.g. 83.50" min="0" step="0.01">
-            </div>
-            
-            <div class="exchange-rate" id="exchangeRate">
-                Fetching current USD to INR rate...
-            </div>
-            
-            <div class="error" id="error" style="display: none;"></div>
+            <div class="error" id="error"></div>
             
             <button id="calculateBtn">Calculate Conversion</button>
             
@@ -409,6 +370,15 @@
                     <span class="result-label">Final INR Amount:</span>
                     <span class="result-value" id="finalAmount"></span>
                 </div>
+                
+                <div class="btn-group">
+                    <button id="downloadBtn" class="secondary-btn">Download Receipt</button>
+                    <button id="resetBtn" class="secondary-btn">Reset</button>
+                </div>
+            </div>
+            
+            <div class="credit">
+                Made with ❤️ by <a href="https://github.com/souvik-pl" target="_blank" rel="noopener">Souvik</a>
             </div>
         </div>
     </div>
@@ -416,100 +386,47 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const creditInput = document.getElementById('credit');
+            const exchangeRateInput = document.getElementById('exchangeRate');
             const calculateBtn = document.getElementById('calculateBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const resetBtn = document.getElementById('resetBtn');
             const resultsDiv = document.getElementById('results');
             const errorDiv = document.getElementById('error');
-            const exchangeRateDiv = document.getElementById('exchangeRate');
-            const autoRateToggle = document.getElementById('autoRateToggle');
-            const manualRateGroup = document.getElementById('manualRateGroup');
-            const manualRateInput = document.getElementById('manualRate');
-            
-            let usdToInrRate = 0;
-            let isAutoRate = true;
+            const themeToggle = document.getElementById('themeToggle');
             
             // Initialize
-            fetchExchangeRate();
-            
-            // Event listeners
             calculateBtn.addEventListener('click', calculate);
+            downloadBtn.addEventListener('click', downloadReceipt);
+            resetBtn.addEventListener('click', resetCalculator);
+            
+            // Theme toggle functionality
+            themeToggle.addEventListener('click', toggleTheme);
+            
+            // Check for saved theme preference or use system preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+            
             creditInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') calculate();
             });
-            
-            autoRateToggle.addEventListener('change', function() {
-                isAutoRate = this.checked;
-                if (isAutoRate) {
-                    manualRateGroup.style.display = 'none';
-                    fetchExchangeRate();
-                } else {
-                    manualRateGroup.style.display = 'block';
-                    exchangeRateDiv.textContent = 'Using manual exchange rate';
-                }
-            });
-            
-            manualRateInput.addEventListener('input', function() {
-                if (!isAutoRate) {
-                    const rate = parseFloat(this.value);
-                    if (!isNaN(rate) && rate > 0) {
-                        usdToInrRate = rate;
-                        exchangeRateDiv.innerHTML = `Using manual rate: <span>1 USD = ${usdToInrRate.toFixed(2)} INR</span>`;
-                    }
-                }
-            });
-            
-            function fetchExchangeRate() {
-                if (!isAutoRate) return;
-                
-                exchangeRateDiv.textContent = 'Fetching current USD to INR rate...';
-                
-                // Using a free API for exchange rates
-                fetch('https://api.exchangerate-api.com/v4/latest/USD')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data && data.rates && data.rates.INR) {
-                            usdToInrRate = data.rates.INR;
-                            exchangeRateDiv.innerHTML = `Current USD to INR rate: <span>1 USD = ${usdToInrRate.toFixed(2)} INR</span> (auto)`;
-                        } else {
-                            useFallbackRate();
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching exchange rate:', error);
-                        useFallbackRate();
-                    });
-            }
-            
-            function useFallbackRate() {
-                usdToInrRate = 83.50;
-                exchangeRateDiv.innerHTML = `Using default rate: <span>1 USD = ${usdToInrRate.toFixed(2)} INR</span> (API failed)`;
-            }
             
             function calculate() {
                 errorDiv.style.display = 'none';
                 
                 const credit = parseFloat(creditInput.value);
+                const exchangeRate = parseFloat(exchangeRateInput.value);
                 
-                if (isNaN(credit)) {
+                if (isNaN(credit) || credit <= 0) {
                     showError('Please enter a valid credit amount');
                     return;
                 }
                 
-                if (credit <= 0) {
-                    showError('Credit amount must be greater than 0');
-                    return;
-                }
-                
-                if (!isAutoRate) {
-                    const manualRate = parseFloat(manualRateInput.value);
-                    if (isNaN(manualRate) || manualRate <= 0) {
-                        showError('Please enter a valid USD to INR rate');
-                        return;
-                    }
-                    usdToInrRate = manualRate;
-                }
-                
-                if (usdToInrRate <= 0) {
-                    showError('Exchange rate not available. Please try again later.');
+                if (isNaN(exchangeRate) || exchangeRate <= 0) {
+                    showError('Please enter a valid USD to INR rate');
                     return;
                 }
                 
@@ -518,7 +435,7 @@
                 const ineligibleAmount = fullAmountUSD * 0.60;
                 const eligibleAmount = fullAmountUSD * 0.40;
                 const netAmountUSD = eligibleAmount * 0.955; // 4.5% deduction
-                const finalAmountINR = netAmountUSD * usdToInrRate;
+                const finalAmountINR = netAmountUSD * exchangeRate;
                 
                 // Display results
                 document.getElementById('fullAmount').textContent = `$${fullAmountUSD.toFixed(2)}`;
@@ -528,9 +445,54 @@
                 document.getElementById('finalAmount').textContent = `₹${finalAmountINR.toFixed(2)}`;
                 
                 resultsDiv.style.display = 'block';
-                
-                // Smooth scroll to results
                 resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            
+            function downloadReceipt() {
+                const credit = creditInput.value;
+                const exchangeRate = exchangeRateInput.value;
+                const finalAmount = document.getElementById('finalAmount').textContent;
+                
+                if (!credit || !finalAmount) {
+                    showError('Please calculate first before downloading');
+                    return;
+                }
+                
+                const receipt = `
+                    Credit to INR Receipt
+                    ----------------------------
+                    Credit Amount: ${credit}
+                    Exchange Rate: 1 USD = ${exchangeRate} INR
+                    
+                    Calculation Breakdown:
+                    - 100% USD Amount: ${document.getElementById('fullAmount').textContent}
+                    - 60% Ineligible: ${document.getElementById('ineligibleAmount').textContent}
+                    - 40% Eligible: ${document.getElementById('eligibleAmount').textContent}
+                    - After 4.5% Deduction: ${document.getElementById('netAmount').textContent}
+                    
+                    Final Amount: ${finalAmount}
+                    
+                    Generated on: ${new Date().toLocaleString()}
+                    Made with ❤️ by Souvik
+                `;
+                
+                const blob = new Blob([receipt], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Credit_Receipt_${new Date().toISOString().slice(0,10)}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+            
+            function resetCalculator() {
+                creditInput.value = '';
+                exchangeRateInput.value = '83.50';
+                resultsDiv.style.display = 'none';
+                errorDiv.style.display = 'none';
+                creditInput.focus();
             }
             
             function showError(message) {
@@ -543,6 +505,21 @@
                 setTimeout(() => {
                     errorDiv.style.animation = 'pulse 0.5s';
                 }, 10);
+            }
+            
+            function toggleTheme() {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                
+                // Update the toggle icon
+                const icon = themeToggle.querySelector('svg');
+                if (newTheme === 'dark') {
+                    icon.innerHTML = '<path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1-8.313-12.454z"/>';
+                } else {
+                    icon.innerHTML = '<path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/>';
+                }
             }
         });
     </script>
