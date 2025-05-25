@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Credit to INR Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --primary: #4361ee;
@@ -19,7 +21,6 @@
             --transition: all 0.3s ease;
         }
 
-        /* Dark mode variables */
         @media (prefers-color-scheme: dark) {
             :root {
                 --light: #121212;
@@ -111,10 +112,18 @@
             color: var(--dark);
         }
 
+        input::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+            font-style: italic;
+        }
+
         @media (prefers-color-scheme: dark) {
             input {
                 background: #1e1e1e;
                 border-color: rgba(255, 255, 255, 0.1);
+            }
+            input::placeholder {
+                color: rgba(255, 255, 255, 0.4);
             }
         }
 
@@ -320,6 +329,43 @@
             height: 16px;
             fill: white;
         }
+
+        /* PDF receipt styling */
+        #pdf-receipt {
+            display: none;
+            padding: 20px;
+            background: white;
+            color: black;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .pdf-header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #4361ee;
+            padding-bottom: 10px;
+        }
+        
+        .pdf-header h2 {
+            color: #4361ee;
+            margin-bottom: 5px;
+        }
+        
+        .pdf-result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .pdf-footer {
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #ccc;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -342,7 +388,7 @@
             
             <div class="input-group">
                 <label for="exchangeRate">Current USD to INR Rate:</label>
-                <input type="number" id="exchangeRate" placeholder="e.g. 83.50" min="0" step="0.01" value="83.50">
+                <input type="number" id="exchangeRate" placeholder="e.g. 83.50" min="0" step="0.01">
             </div>
             
             <div class="error" id="error"></div>
@@ -372,23 +418,78 @@
                 </div>
                 
                 <div class="btn-group">
-                    <button id="downloadBtn" class="secondary-btn">Download Receipt</button>
+                    <button id="downloadPdfBtn" class="secondary-btn">Download PDF</button>
                     <button id="resetBtn" class="secondary-btn">Reset</button>
                 </div>
             </div>
             
             <div class="credit">
-                Made with ❤️ by <a href="https://github.com/souvik-pl" target="_blank" rel="noopener">Souvik</a>
+                Developed by <a href="https://github.com/souvik-pl" target="_blank" rel="noopener">Souvik Giri</a>
             </div>
         </div>
     </div>
 
+    <!-- Hidden PDF receipt template -->
+    <div id="pdf-receipt">
+        <div class="pdf-header">
+            <h2>Credit to INR Receipt</h2>
+            <p>Generated on: <span id="pdf-date"></span></p>
+        </div>
+        
+        <div class="pdf-result-item">
+            <strong>Credit Amount:</strong>
+            <span id="pdf-credit"></span>
+        </div>
+        
+        <div class="pdf-result-item">
+            <strong>Exchange Rate:</strong>
+            <span id="pdf-rate"></span>
+        </div>
+        
+        <div style="margin: 15px 0; border-top: 1px dashed #ccc;"></div>
+        
+        <div class="pdf-result-item">
+            <span>100% USD Amount:</span>
+            <span id="pdf-full"></span>
+        </div>
+        
+        <div class="pdf-result-item">
+            <span>60% Ineligible Amount:</span>
+            <span id="pdf-ineligible"></span>
+        </div>
+        
+        <div class="pdf-result-item">
+            <span>40% Eligible Amount:</span>
+            <span id="pdf-eligible"></span>
+        </div>
+        
+        <div class="pdf-result-item">
+            <span>After 4.5% Deduction:</span>
+            <span id="pdf-net"></span>
+        </div>
+        
+        <div style="margin: 15px 0; border-top: 1px dashed #ccc;"></div>
+        
+        <div class="pdf-result-item" style="font-weight: bold; font-size: 1.1rem;">
+            <span>Final INR Amount:</span>
+            <span id="pdf-final" style="color: #3a0ca3;"></span>
+        </div>
+        
+        <div class="pdf-footer">
+            <p>Thank you for using our service</p>
+            <p>Developed by Souvik Giri</p>
+        </div>
+    </div>
+
     <script>
+        // Initialize jsPDF
+        const { jsPDF } = window.jspdf;
+        
         document.addEventListener('DOMContentLoaded', function() {
             const creditInput = document.getElementById('credit');
             const exchangeRateInput = document.getElementById('exchangeRate');
             const calculateBtn = document.getElementById('calculateBtn');
-            const downloadBtn = document.getElementById('downloadBtn');
+            const downloadPdfBtn = document.getElementById('downloadPdfBtn');
             const resetBtn = document.getElementById('resetBtn');
             const resultsDiv = document.getElementById('results');
             const errorDiv = document.getElementById('error');
@@ -396,7 +497,7 @@
             
             // Initialize
             calculateBtn.addEventListener('click', calculate);
-            downloadBtn.addEventListener('click', downloadReceipt);
+            downloadPdfBtn.addEventListener('click', downloadPdfReceipt);
             resetBtn.addEventListener('click', resetCalculator);
             
             // Theme toggle functionality
@@ -418,7 +519,7 @@
                 errorDiv.style.display = 'none';
                 
                 const credit = parseFloat(creditInput.value);
-                const exchangeRate = parseFloat(exchangeRateInput.value);
+                const exchangeRate = parseFloat(exchangeRateInput.value) || 83.50; // Default value if empty
                 
                 if (isNaN(credit) || credit <= 0) {
                     showError('Please enter a valid credit amount');
@@ -448,9 +549,9 @@
                 resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
             
-            function downloadReceipt() {
+            function downloadPdfReceipt() {
                 const credit = creditInput.value;
-                const exchangeRate = exchangeRateInput.value;
+                const exchangeRate = exchangeRateInput.value || 83.50;
                 const finalAmount = document.getElementById('finalAmount').textContent;
                 
                 if (!credit || !finalAmount) {
@@ -458,38 +559,45 @@
                     return;
                 }
                 
-                const receipt = `
-                    Credit to INR Receipt
-                    ----------------------------
-                    Credit Amount: ${credit}
-                    Exchange Rate: 1 USD = ${exchangeRate} INR
-                    
-                    Calculation Breakdown:
-                    - 100% USD Amount: ${document.getElementById('fullAmount').textContent}
-                    - 60% Ineligible: ${document.getElementById('ineligibleAmount').textContent}
-                    - 40% Eligible: ${document.getElementById('eligibleAmount').textContent}
-                    - After 4.5% Deduction: ${document.getElementById('netAmount').textContent}
-                    
-                    Final Amount: ${finalAmount}
-                    
-                    Generated on: ${new Date().toLocaleString()}
-                    Made with ❤️ by Souvik
-                `;
+                // Update PDF template
+                document.getElementById('pdf-date').textContent = new Date().toLocaleString();
+                document.getElementById('pdf-credit').textContent = credit;
+                document.getElementById('pdf-rate').textContent = `1 USD = ${exchangeRate} INR`;
+                document.getElementById('pdf-full').textContent = document.getElementById('fullAmount').textContent;
+                document.getElementById('pdf-ineligible').textContent = document.getElementById('ineligibleAmount').textContent;
+                document.getElementById('pdf-eligible').textContent = document.getElementById('eligibleAmount').textContent;
+                document.getElementById('pdf-net').textContent = document.getElementById('netAmount').textContent;
+                document.getElementById('pdf-final').textContent = finalAmount;
                 
-                const blob = new Blob([receipt], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `Credit_Receipt_${new Date().toISOString().slice(0,10)}.txt`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+                // Create PDF
+                const pdfReceipt = document.getElementById('pdf-receipt');
+                
+                html2canvas(pdfReceipt).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const imgWidth = 190;
+                    const pageHeight = 290;
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    let heightLeft = imgHeight;
+                    let position = 10;
+                    
+                    pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                    
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+                    
+                    pdf.save(`Credit_Receipt_${new Date().toISOString().slice(0,10)}.pdf`);
+                });
             }
             
             function resetCalculator() {
                 creditInput.value = '';
-                exchangeRateInput.value = '83.50';
+                exchangeRateInput.value = '';
                 resultsDiv.style.display = 'none';
                 errorDiv.style.display = 'none';
                 creditInput.focus();
