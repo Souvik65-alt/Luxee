@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit to INR Calculator</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .content {
+            padding: 25px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 20px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .results {
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 600;
+        }
+
+        .result-value {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .final-result {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px dashed var(--accent);
+        }
+
+        .final-result .result-label {
+            font-size: 1.1rem;
+        }
+
+        .final-result .result-value {
+            font-size: 1.3rem;
+            color: var(--secondary);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 10px;
+            color: var(--accent);
+            font-style: italic;
+        }
+
+        .error {
+            color: var(--warning);
+            text-align: center;
+            padding: 10px;
+            font-weight: 600;
+        }
+
+        .exchange-rate {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+
+        .exchange-rate span {
+            font-weight: 600;
+            color: var(--success);
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .results {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Credit to INR Calculator</h1>
+            <p>Convert your credits to INR with real-time exchange rates</p>
+        </div>
+        
+        <div class="content">
+            <div class="input-group">
+                <label for="credit">Enter Credit Amount:</label>
+                <input type="number" id="credit" placeholder="e.g. 1000" min="0" step="1">
+            </div>
+            
+            <div class="exchange-rate" id="exchangeRate">
+                Fetching current USD to INR rate...
+            </div>
+            
+            <button id="calculateBtn">Calculate</button>
+            
+            <div class="results" id="results" style="display: none;">
+                <div class="result-item">
+                    <span class="result-label">100% USD Amount:</span>
+                    <span class="result-value" id="fullAmount"></span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">60% Ineligible Amount:</span>
+                    <span class="result-value" id="ineligibleAmount"></span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">40% Eligible Amount:</span>
+                    <span class="result-value" id="eligibleAmount"></span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">After 4.5% Deduction:</span>
+                    <span class="result-value" id="netAmount"></span>
+                </div>
+                <div class="result-item final-result">
+                    <span class="result-label">Final INR Amount:</span>
+                    <span class="result-value" id="finalAmount"></span>
+                </div>
+            </div>
+            
+            <div class="error" id="error" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const creditInput = document.getElementById('credit');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const resultsDiv = document.getElementById('results');
+            const errorDiv = document.getElementById('error');
+            const exchangeRateDiv = document.getElementById('exchangeRate');
+            
+            let usdToInrRate = 0;
+            
+            // Fetch current USD to INR exchange rate
+            fetchExchangeRate();
+            
+            calculateBtn.addEventListener('click', calculate);
+            creditInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    calculate();
+                }
+            });
+            
+            function fetchExchangeRate() {
+                // Using a free API for exchange rates
+                // Note: Free APIs may have limitations. For production, consider a more reliable API.
+                fetch('https://api.exchangerate-api.com/v4/latest/USD')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.rates && data.rates.INR) {
+                            usdToInrRate = data.rates.INR;
+                            exchangeRateDiv.innerHTML = `Current USD to INR rate: <span>1 USD = ${usdToInrRate.toFixed(2)} INR</span>`;
+                        } else {
+                            // Fallback rate if API fails
+                            usdToInrRate = 83.50;
+                            exchangeRateDiv.innerHTML = `Using default USD to INR rate: <span>1 USD = ${usdToInrRate.toFixed(2)} INR</span> (API failed)`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching exchange rate:', error);
+                        // Fallback rate if API fails
+                        usdToInrRate = 83.50;
+                        exchangeRateDiv.innerHTML = `Using default USD to INR rate: <span>1 USD = ${usdToInrRate.toFixed(2)} INR</span> (API failed)`;
+                    });
+            }
+            
+            function calculate() {
+                errorDiv.style.display = 'none';
+                
+                const credit = parseFloat(creditInput.value);
+                
+                if (isNaN(credit) {
+                    showError('Please enter a valid credit amount');
+                    return;
+                }
+                
+                if (credit <= 0) {
+                    showError('Credit amount must be greater than 0');
+                    return;
+                }
+                
+                if (usdToInrRate <= 0) {
+                    showError('Exchange rate not available. Please try again later.');
+                    return;
+                }
+                
+                // Perform calculations
+                const fullAmountUSD = credit * 0.0588;
+                const ineligibleAmount = fullAmountUSD * 0.60;
+                const eligibleAmount = fullAmountUSD * 0.40;
+                const netAmountUSD = eligibleAmount * 0.955; // 4.5% deduction
+                const finalAmountINR = netAmountUSD * usdToInrRate;
+                
+                // Display results
+                document.getElementById('fullAmount').textContent = `$${fullAmountUSD.toFixed(2)}`;
+                document.getElementById('ineligibleAmount').textContent = `$${ineligibleAmount.toFixed(2)}`;
+                document.getElementById('eligibleAmount').textContent = `$${eligibleAmount.toFixed(2)}`;
+                document.getElementById('netAmount').textContent = `$${netAmountUSD.toFixed(2)}`;
+                document.getElementById('finalAmount').textContent = `₹${finalAmountINR.toFixed(2)}`;
+                
+                resultsDiv.style.display = 'block';
+            }
+            
+            function showError(message) {
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+                resultsDiv.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
