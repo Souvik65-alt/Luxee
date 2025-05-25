@@ -332,12 +332,14 @@
 
         /* PDF receipt styling */
         #pdf-receipt {
-            display: none;
+            position: absolute;
+            left: -9999px;
+            width: 100%;
+            max-width: 500px;
             padding: 20px;
             background: white;
             color: black;
-            max-width: 500px;
-            margin: 0 auto;
+            box-sizing: border-box;
         }
         
         .pdf-header {
@@ -482,9 +484,6 @@
     </div>
 
     <script>
-        // Initialize jsPDF
-        const { jsPDF } = window.jspdf;
-        
         document.addEventListener('DOMContentLoaded', function() {
             const creditInput = document.getElementById('credit');
             const exchangeRateInput = document.getElementById('exchangeRate');
@@ -549,10 +548,10 @@
                 resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
             
-            function downloadPdfReceipt() {
+            async function downloadPdfReceipt() {
                 const credit = creditInput.value;
                 const exchangeRate = exchangeRateInput.value || 83.50;
-                const finalAmount = document.getElementById('finalAmount').textContent;
+                const finalAmount = document.getElementById('finalAmount')?.textContent;
                 
                 if (!credit || !finalAmount) {
                     showError('Please calculate first before downloading');
@@ -572,27 +571,23 @@
                 // Create PDF
                 const pdfReceipt = document.getElementById('pdf-receipt');
                 
-                html2canvas(pdfReceipt).then(canvas => {
+                try {
+                    const canvas = await html2canvas(pdfReceipt);
                     const imgData = canvas.toDataURL('image/png');
+                    
+                    // Use the jsPDF instance correctly
+                    const { jsPDF } = window.jspdf;
                     const pdf = new jsPDF('p', 'mm', 'a4');
+                    
                     const imgWidth = 190;
-                    const pageHeight = 290;
                     const imgHeight = canvas.height * imgWidth / canvas.width;
-                    let heightLeft = imgHeight;
-                    let position = 10;
                     
-                    pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-                    
-                    while (heightLeft >= 0) {
-                        position = heightLeft - imgHeight;
-                        pdf.addPage();
-                        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-                        heightLeft -= pageHeight;
-                    }
-                    
+                    pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
                     pdf.save(`Credit_Receipt_${new Date().toISOString().slice(0,10)}.pdf`);
-                });
+                } catch (error) {
+                    console.error('Error generating PDF:', error);
+                    showError('Failed to generate PDF. Please try again.');
+                }
             }
             
             function resetCalculator() {
