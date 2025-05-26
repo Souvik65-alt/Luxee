@@ -483,6 +483,11 @@
         </div>
     </div>
 
+    <!-- Audio element for coin sound -->
+    <audio id="coinSound" preload="auto">
+        <source src="mp3/WhatsApp Audio 2025-05-26 at 21.55.56_d874fea8.mp3" type="audio/mpeg">
+    </audio>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const creditInput = document.getElementById('credit');
@@ -493,6 +498,7 @@
             const resultsDiv = document.getElementById('results');
             const errorDiv = document.getElementById('error');
             const themeToggle = document.getElementById('themeToggle');
+            const coinSound = document.getElementById('coinSound');
             
             // Initialize
             calculateBtn.addEventListener('click', calculate);
@@ -546,6 +552,25 @@
                 
                 resultsDiv.style.display = 'block';
                 resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Play coin sound effect for exactly 2 seconds
+                playCoinSoundForDuration(2000);
+            }
+            
+            function playCoinSoundForDuration(duration) {
+                // Reset sound to start
+                coinSound.currentTime = 0;
+                
+                // Play the sound
+                coinSound.play().catch(e => {
+                    console.log("Audio play failed:", e);
+                });
+                
+                // Stop after specified duration
+                setTimeout(() => {
+                    coinSound.pause();
+                    coinSound.currentTime = 0;
+                }, duration);
             }
             
             async function downloadPdfReceipt() {
